@@ -20,6 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Grpc\Shared.Grpc.csproj" />
+    <ProjectReference Include="..\Shared\Grpc\Shared.Grpc.csproj" />
   </ItemGroup>
 </Project>
