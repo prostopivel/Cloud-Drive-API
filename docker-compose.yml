@@ -87,8 +87,17 @@ services:
     depends_on:
       auth-db:
         condition: service_healthy
+      redis:
+        condition: service_started
     environment:
       - ConnectionStrings__DefaultConnection=Host=auth-db;Database=auth_db;Username=auth_user;Password=auth_password
+      - Redis__ConnectionString=redis:6379
+      - Redis__InstanceName=AuthService
+      - Redis__CacheTimeoutMinutes=30
+      - Jwt__Secret=cloud-drive-api-auth-service-nov-2025-by-pavel
+      - Jwt__Issuer=SimpleCloudDrive
+      - Jwt__Audience=SimpleCloudDrive
+      - Jwt__ExpiryMinutes=60
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:5001
     healthcheck:

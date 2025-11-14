@@ -4,9 +4,9 @@ namespace Auth.Core.Interfaces.Repositories
 {
     public interface IUserRepository
     {
-        Task<User?> GetByIdAsync(Guid id);
-        Task<User?> GetByEmailAsync(string email);
-        Task<User> AddAsync(User user);
-        Task<bool> ExistsByEmailAsync(string email);
+        Task<User?> GetByIdAsync(Guid id, CancellationToken token = default);
+        Task<User?> GetByEmailAsync(string email, CancellationToken token = default);
+        Task<User> AddAsync(User user, CancellationToken token = default);
+        Task<bool> ExistsByEmailAsync(string email, CancellationToken token = default);
     }
 }
