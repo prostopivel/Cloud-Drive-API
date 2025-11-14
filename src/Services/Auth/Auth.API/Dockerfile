@@ -1,29 +1,25 @@
-# См. статью по ссылке https://aka.ms/customizecontainer, чтобы узнать как настроить контейнер отладки и как Visual Studio использует этот Dockerfile для создания образов для ускорения отладки.
-
-# Этот этап используется при запуске из VS в быстром режиме (по умолчанию для конфигурации отладки)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 5001
+EXPOSE 5002
 
-
-# Этот этап используется для сборки проекта службы
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Services/Auth/Auth.API/Auth.API/Auth.API.csproj", "src/Services/Auth/Auth.API/Auth.API/"]
-RUN dotnet restore "./src/Services/Auth/Auth.API/Auth.API/Auth.API.csproj"
+COPY ["Services/Auth/Auth.API/Auth.API.csproj", "Services/Auth/Auth.API/"]
+COPY ["Services/Auth/Auth.Core/Auth.Core.csproj", "Services/Auth/Auth.Core/"]
+COPY ["Services/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj", "Services/Auth/Auth.Infrastructure/"]
+COPY ["Services/Auth/Auth.Grpc/Auth.Grpc.csproj", "Services/Auth/Auth.Grpc/"]
+COPY ["Shared/Common/Shared.Common.csproj", "Shared/Common/"]
+COPY ["Shared/Grpc/Shared.Grpc.csproj", "Shared/Grpc/"]
+RUN dotnet restore "Services/Auth/Auth.API/Auth.API.csproj"
+
 COPY . .
-WORKDIR "/src/src/Services/Auth/Auth.API/Auth.API"
-RUN dotnet build "./Auth.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Services/Auth/Auth.API"
+RUN dotnet build "Auth.API.csproj" -c Release -o /app/build
 
-# Этот этап используется для публикации проекта службы, который будет скопирован на последний этап
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Auth.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Auth.API.csproj" -c Release -o /app/publish
 
-# Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
