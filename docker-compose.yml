@@ -1,16 +1,37 @@
 version: '3.8'
 
 services:
-  postgres:
+  auth-db:
     image: postgres:15
     environment:
-      POSTGRES_DB: clouddrive
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - auth_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  metadata-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: metadata_db
+      POSTGRES_USER: metadata_user
+      POSTGRES_PASSWORD: metadata_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - metadata_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metadata_user -d metadata_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   redis:
     image: redis:7-alpine
@@ -18,6 +39,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    command: redis-server --appendonly yes
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -29,6 +51,11 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   api-gateway:
     build:
@@ -37,11 +64,19 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - auth-service
-      - filemetadata-service
-      - filestorage-service
+      auth-service:
+        condition: service_healthy
+      filemetadata-service:
+        condition: service_healthy
+      filestorage-service:
+        condition: service_healthy
     environment:
+      - Services__Auth=http://auth-service:5001
+      - Services__FileMetadata=http://filemetadata-service:5002
+      - Services__FileStorage=http://filestorage-service:5003
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:5000
+    restart: unless-stopped
 
   auth-service:
     build:
@@ -50,10 +85,18 @@ services:
     ports:
       - "5001:5001"
     depends_on:
-      - postgres
+      auth-db:
+        condition: service_healthy
     environment:
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=clouddrive;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=auth_db;Username=auth_user;Password=auth_password
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:5001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
   filemetadata-service:
     build:
@@ -62,14 +105,24 @@ services:
     ports:
       - "5002:5002"
     depends_on:
-      - postgres
-      - redis
-      - rabbitmq
+      metadata-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     environment:
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=clouddrive;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=metadata-db;Database=metadata_db;Username=metadata_user;Password=metadata_password
       - Redis__ConnectionString=redis:6379
       - RabbitMQ__Host=rabbitmq
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:5002
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
   filestorage-service:
     build:
@@ -78,13 +131,25 @@ services:
     ports:
       - "5003:5003"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RabbitMQ__Host=rabbitmq
       - FileStorage__Path=/app/storage
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:5003
+    volumes:
+      - filestorage_data:/app/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
+  auth_postgres_data:
+  metadata_postgres_data:
   redis_data:
   rabbitmq_data:
+  filestorage_data:

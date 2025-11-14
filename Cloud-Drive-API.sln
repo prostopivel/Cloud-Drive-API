@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Components", "Solu
 		.gitignore = .gitignore
 		docker-compose.yml = docker-compose.yml
 		README.md = README.md
+		setup-and-run.sh = setup-and-run.sh
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Messaging", "src\Shared\Messaging\Shared.Messaging.csproj", "{46474C71-8B27-D498-D9C6-202F8B067D25}"

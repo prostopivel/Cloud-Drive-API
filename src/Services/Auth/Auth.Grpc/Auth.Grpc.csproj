@@ -6,4 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.60.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\..\..\Shared\Grpc\Protos\auth.proto" GrpcServices="Server" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Auth.Core\Auth.Core.csproj" />
+  </ItemGroup>
+
 </Project>
