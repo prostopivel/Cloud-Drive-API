@@ -14,28 +14,32 @@ namespace Auth.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<User?> GetByIdAsync(Guid id)
+        public async Task<User?> GetByIdAsync(Guid id,
+            CancellationToken token = default)
         {
-            return await _context.Users.FindAsync(id);
+            return await _context.Users.FindAsync([id], cancellationToken: token);
         }
 
-        public async Task<User?> GetByEmailAsync(string email)
+        public async Task<User?> GetByEmailAsync(string email,
+            CancellationToken token = default)
         {
             return await _context.Users
-                .SingleOrDefaultAsync(u => u.Email == email);
+                .SingleOrDefaultAsync(u => u.Email == email, cancellationToken: token);
         }
 
-        public async Task<User> AddAsync(User user)
+        public async Task<User> AddAsync(User user,
+            CancellationToken token = default)
         {
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken: token);
             return user;
         }
 
-        public async Task<bool> ExistsByEmailAsync(string email)
+        public async Task<bool> ExistsByEmailAsync(string email,
+            CancellationToken token = default)
         {
             return await _context.Users
-                .AnyAsync(u => u.Email == email);
+                .AnyAsync(u => u.Email == email, cancellationToken: token);
         }
     }
 }

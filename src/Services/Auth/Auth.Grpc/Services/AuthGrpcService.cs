@@ -21,12 +21,16 @@ namespace Auth.Grpc.Services
         {
             try
             {
-                var isValid = await _authService.ValidateTokenAsync(request.Token);
+                var token = context.CancellationToken;
+                var isValid = await _authService.ValidateTokenAsync(
+                    request.Token, token: token);
                 Guid? userId = null;
+                string username = string.Empty;
 
                 if (isValid)
                 {
-                    userId = await _authService.GetUserIdFromTokenAsync(request.Token);
+                    userId = await _authService.GetUserIdFromTokenAsync(
+                        request.Token, token: token);
                 }
 
                 return new TokenValidationResponse
@@ -49,7 +53,10 @@ namespace Auth.Grpc.Services
         {
             try
             {
-                var userId = await _authService.GetUserIdFromTokenAsync(request.Token);
+                var token = context.CancellationToken;
+                var userId = await _authService.GetUserIdFromTokenAsync(
+                    request.Token, token: token);
+
                 return new UserIdResponse
                 {
                     UserId = userId?.ToString()
