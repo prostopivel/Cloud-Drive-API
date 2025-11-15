@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\IntegrationTests.Common\IntegrationTests.Common.csproj" />
     <ProjectReference Include="..\..\src\Services\Auth\Auth.API\Auth.API.csproj" />
+    <ProjectReference Include="..\IntegrationTests.Common\IntegrationTests.Common.csproj" />
   </ItemGroup>
 
 </Project>
