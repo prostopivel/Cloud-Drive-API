@@ -1,4 +1,5 @@
-﻿using Auth.Core.Entities;
+﻿using Auth.Core.Constants;
+using Auth.Core.Entities;
 using Auth.Core.Exceptions;
 using Auth.Core.Interfaces.Repositories;
 using Auth.Core.Interfaces.Services;
@@ -60,7 +61,7 @@ namespace Auth.Core.Services
             string password,
             CancellationToken token = default)
         {
-            var cacheKey = $"user_by_email:{email}";
+            var cacheKey = $"{CacheKeys.USER_BY_EMAIL}:{email}";
             var cachedUser = await _cacheService.GetAsync<User>(cacheKey, token: token);
 
             if (cachedUser != null)
@@ -92,7 +93,7 @@ namespace Auth.Core.Services
         public async Task<bool> ValidateTokenAsync(string jwtToken,
             CancellationToken token = default)
         {
-            var cacheKey = $"token_validation:{jwtToken}";
+            var cacheKey = $"{CacheKeys.TOKEN_VALIDATION}:{jwtToken}";
             var cachedResult = await _cacheService.GetAsync<bool?>(cacheKey, token: token);
 
             if (cachedResult.HasValue)
@@ -114,7 +115,7 @@ namespace Auth.Core.Services
         public async Task<Guid?> GetUserIdFromTokenAsync(string jwtToken,
             CancellationToken token = default)
         {
-            var cacheKey = $"token_user:{jwtToken}";
+            var cacheKey = $"{CacheKeys.TOKEN_USER}:{jwtToken}";
             var cachedUserId = await _cacheService.GetAsync<string>(cacheKey, token: token);
 
             if (!string.IsNullOrEmpty(cachedUserId) && Guid.TryParse(cachedUserId, out var userId))
@@ -141,8 +142,8 @@ namespace Auth.Core.Services
         {
             var tasks = new List<Task>
             {
-                _cacheService.RemoveAsync($"user_by_id:{userId}", token: token),
-                _cacheService.RemoveAsync($"user_by_email:{email}", token: token)
+                _cacheService.RemoveAsync($"{CacheKeys.USER_BY_ID}:{userId}", token: token),
+                _cacheService.RemoveAsync($"{CacheKeys.USER_BY_EMAIL}:{email}", token: token)
             };
 
             await Task.WhenAll(tasks);
