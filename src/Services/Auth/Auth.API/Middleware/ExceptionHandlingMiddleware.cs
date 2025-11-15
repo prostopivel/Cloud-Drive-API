@@ -1,4 +1,6 @@
-﻿using Shared.Common.Models;
+﻿using Auth.Core.Exceptions;
+using Shared.Common.Exceptions;
+using Shared.Common.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
@@ -68,6 +70,26 @@ namespace Auth.API.Middleware
                         Code = "VALIDATION_ERROR",
                     };
                     _logger.LogWarning(validationEx, "Validation error occurred");
+                    break;
+
+                case ConflictException conflictnEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    response = new ErrorResponse
+                    {
+                        Error = conflictnEx.Message,
+                        Code = "CONFLICT_ERROR",
+                    };
+                    _logger.LogWarning(conflictnEx, "Conflict error occurred");
+                    break;
+
+                case UnauthorizedException unauthorizedEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    response = new ErrorResponse
+                    {
+                        Error = unauthorizedEx.Message,
+                        Code = "UNAUTHORIZED_ERROR",
+                    };
+                    _logger.LogWarning(unauthorizedEx, "Unauthorized error occurred");
                     break;
 
                 default:
