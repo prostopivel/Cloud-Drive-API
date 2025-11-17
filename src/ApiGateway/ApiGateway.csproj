@@ -21,5 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\Grpc\Shared.Grpc.csproj" />
+    <ProjectReference Include="..\Shared\Common\Shared.Common.csproj" />
   </ItemGroup>
+
 </Project>
