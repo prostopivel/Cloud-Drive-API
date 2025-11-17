@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Components", "Solution Components", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		docker-compose.override.yml = docker-compose.override.yml
 		docker-compose.yml = docker-compose.yml
 		README.md = README.md
 		setup-and-run.sh = setup-and-run.sh
@@ -46,12 +47,24 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "src\ApiGateway\ApiGateway.csproj", "{967A9878-9005-C8B0-725C-1F34134168DB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{909214BF-1E60-4841-88AD-22048DCF2823}"
+	ProjectSection(SolutionItems) = preProject
+		tests\.dockerignore = tests\.dockerignore
+		tests\Dockerfile = tests\Dockerfile
+		tests\TestDatabase.Dockerfile = tests\TestDatabase.Dockerfile
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.IntegrationTests", "tests\Auth.IntegrationTests\Auth.IntegrationTests.csproj", "{9B736306-8C63-4011-A3FE-D6E022C8C602}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.LoadTests", "tests\Auth.LoadTests\Auth.LoadTests.csproj", "{A7D48F12-BD65-4FEE-A776-38059E1FB74B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests.Common", "tests\IntegrationTests.Common\IntegrationTests.Common.csproj", "{0CAE3679-BC69-0B11-BA49-A385366224FE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{3366B6D5-7399-4B0E-AA8B-BF358B309B1A}"
+	ProjectSection(SolutionItems) = preProject
+		tests\scripts\init-test-db.sh = tests\scripts\init-test-db.sh
+		tests\scripts\run-integration-tests-only.sh = tests\scripts\run-integration-tests-only.sh
+		tests\scripts\run-tests.sh = tests\scripts\run-tests.sh
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Common", "tests\Tests.Common\Tests.Common.csproj", "{7D691932-52C0-AB77-4078-DDA751C4288C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,10 +136,10 @@ Global
 		{A7D48F12-BD65-4FEE-A776-38059E1FB74B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7D48F12-BD65-4FEE-A776-38059E1FB74B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7D48F12-BD65-4FEE-A776-38059E1FB74B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0CAE3679-BC69-0B11-BA49-A385366224FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0CAE3679-BC69-0B11-BA49-A385366224FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0CAE3679-BC69-0B11-BA49-A385366224FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0CAE3679-BC69-0B11-BA49-A385366224FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D691932-52C0-AB77-4078-DDA751C4288C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D691932-52C0-AB77-4078-DDA751C4288C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D691932-52C0-AB77-4078-DDA751C4288C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D691932-52C0-AB77-4078-DDA751C4288C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,7 +157,8 @@ Global
 		{02E93B12-E88C-4B34-8DCA-EC2EF2F7D9B7} = {A0D3F93B-101F-4965-9A32-A8C38E047468}
 		{9B736306-8C63-4011-A3FE-D6E022C8C602} = {909214BF-1E60-4841-88AD-22048DCF2823}
 		{A7D48F12-BD65-4FEE-A776-38059E1FB74B} = {909214BF-1E60-4841-88AD-22048DCF2823}
-		{0CAE3679-BC69-0B11-BA49-A385366224FE} = {909214BF-1E60-4841-88AD-22048DCF2823}
+		{3366B6D5-7399-4B0E-AA8B-BF358B309B1A} = {909214BF-1E60-4841-88AD-22048DCF2823}
+		{7D691932-52C0-AB77-4078-DDA751C4288C} = {909214BF-1E60-4841-88AD-22048DCF2823}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5F730B5-D978-4478-82E5-2F6DB123A629}

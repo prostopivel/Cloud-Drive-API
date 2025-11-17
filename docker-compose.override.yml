@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  auth-integration-tests:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=auth_db;Username=auth_user;Password=auth_password
+      - Redis__ConnectionString=redis:6379
+      - Redis__InstanceName=AuthIntegrationTests
+      - Redis__CacheTimeoutMinutes=30
+    command: ["integration"]
+    profiles: ["test"]
+
+  auth-load-tests:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    depends_on:
+      auth-service:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+      - Redis__ConnectionString=redis:6379
+      - Redis__InstanceName=AuthLoadTests
+      - Redis__CacheTimeoutMinutes=30
+    command: ["load"]
+    profiles: ["test"]
+
+  auth-all-tests:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      auth-service:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=auth_db;Username=auth_user;Password=auth_password
+      - Redis__ConnectionString=redis:6379
+      - Redis__InstanceName=AuthAllTests
+      - Redis__CacheTimeoutMinutes=30
+    command: ["all"]
+    profiles: ["test"]

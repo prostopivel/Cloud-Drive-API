@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
 
-namespace IntegrationTests.Common.Extensions
+namespace Tests.Common.Extensions
 {
     public static class IWebHostBuilderExtensions
     {

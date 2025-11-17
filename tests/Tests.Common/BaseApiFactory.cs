@@ -1,11 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using DotNet.Testcontainers.Containers;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
-namespace IntegrationTests.Common
+namespace Tests.Common
 {
     public abstract class BaseApiFactory<T> : WebApplicationFactory<T>, IAsyncLifetime
         where T : class
     {
+        protected Dictionary<string, DockerContainer> Containers { get; init; }
+
+        protected BaseApiFactory()
+        {
+            Containers = [];
+        }
+
         public HttpClient CreateClientWithJwt(string token)
         {
             var client = CreateClient();
@@ -16,5 +24,6 @@ namespace IntegrationTests.Common
         public abstract Task InitializeAsync();
         public abstract new Task DisposeAsync();
         public abstract Task ResetAsync();
+        protected abstract bool CanConnectToExistingContainers();
     }
 }
