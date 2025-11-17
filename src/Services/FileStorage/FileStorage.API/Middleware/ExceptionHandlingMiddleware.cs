@@ -1,9 +1,9 @@
-﻿using Auth.Core.Exceptions;
+﻿using FileStorage.Core.Exceptions;
 using Shared.API;
 using Shared.Common.Models;
 using System.Net;
 
-namespace Auth.API.Middleware
+namespace FileStorage.API.Middleware
 {
     public class ExceptionHandlingMiddleware : ExceptionHandlingMiddlewareBase
     {
@@ -22,14 +22,14 @@ namespace Auth.API.Middleware
 
             switch (exception)
             {
-                case UnauthorizedException unauthorizedEx:
-                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                case InvalidFileException invalidFileEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     response = new ErrorResponse
                     {
-                        Error = unauthorizedEx.Message,
-                        Code = "UNAUTHORIZED_ERROR",
+                        Error = invalidFileEx.Message,
+                        Code = "INVALID_FILE_ERROR",
                     };
-                    Logger.LogWarning(unauthorizedEx, "Unauthorized error occurred");
+                    Logger.LogWarning(invalidFileEx, "InvalidFile error occurred");
                     break;
 
                 default:
