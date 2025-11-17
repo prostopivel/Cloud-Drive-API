@@ -1,4 +1,4 @@
-namespace FileMetadata.API
+namespace FileStorage.API
 {
     public class Program
     {

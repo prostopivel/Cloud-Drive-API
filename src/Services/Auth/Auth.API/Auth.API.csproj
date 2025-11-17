@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Shared.API\Shared.API.csproj" />
     <ProjectReference Include="..\Auth.Core\Auth.Core.csproj" />
     <ProjectReference Include="..\Auth.Infrastructure\Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\Auth.Grpc\Auth.Grpc.csproj" />

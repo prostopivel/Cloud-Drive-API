@@ -145,8 +145,9 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      - RabbitMQ__Host=rabbitmq
-      - FileStorage__Path=/app/storage
+      - FileStorage__StoragePath=/app/storage
+      - FileStorage__MaxFileSize=104857600
+      - FileStorage__AllowedExtensions=.pdf,.jpg,.jpeg,.png,.txt,.zip
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:5003
     volumes:
