@@ -123,6 +123,8 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Host=metadata-db;Database=metadata_db;Username=metadata_user;Password=metadata_password
       - Redis__ConnectionString=redis:6379
+      - Redis__InstanceName=FileMetadataService
+      - Redis__CacheTimeoutMinutes=30
       - RabbitMQ__Host=rabbitmq
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:5002

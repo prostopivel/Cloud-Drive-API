@@ -4,7 +4,7 @@ using Auth.Core.Interfaces.Repositories;
 using Auth.IntegrationTests.DTOs;
 using Auth.IntegrationTests.Helpers;
 using FluentAssertions;
-using IntegrationTests.Common;
+using Tests.Common;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;

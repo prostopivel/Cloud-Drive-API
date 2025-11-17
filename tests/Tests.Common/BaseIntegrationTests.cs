@@ -1,20 +1,19 @@
 ﻿using System.Text.Json;
 using Xunit;
 
-namespace IntegrationTests.Common
+namespace Tests.Common
 {
     public abstract class BaseIntegrationTests<TFactory, T>
-        : IClassFixture<TFactory>, IAsyncLifetime
+        : BaseTests<TFactory, T>, IAsyncLifetime
         where TFactory : BaseApiFactory<T> where T : class
     {
-        protected readonly TFactory _factory;
         protected readonly HttpClient _client;
         protected readonly JsonSerializerOptions _jsonOptions;
         protected readonly Func<Task> _resetState;
 
         protected BaseIntegrationTests(TFactory factory)
+            : base(factory)
         {
-            _factory = factory;
             _client = factory.CreateClient();
             _resetState = factory.ResetAsync;
             _jsonOptions = new JsonSerializerOptions

@@ -33,7 +33,7 @@ namespace Auth.API
                 options.InstanceName = builder.Configuration["Redis:InstanceName"];
             });
 
-            // Configure JWT settings
+            // Configure settings
             builder.Services.Configure<JwtSettings>(
                 builder.Configuration.GetSection("Jwt"));
             builder.Services.Configure<RedisSettings>(
