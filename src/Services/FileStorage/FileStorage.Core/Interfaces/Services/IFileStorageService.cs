@@ -8,7 +8,7 @@ namespace FileStorage.Core.Interfaces.Services
         Task<StoredFile> UploadFileAsync(IFormFile file, Guid? userId = null,
             CancellationToken token = default);
         Task<FileDownloadResult> DownloadFileAsync(Guid fileId, CancellationToken token = default);
-        Task<bool> DeleteFileAsync(Guid fileId, CancellationToken token = default);
-        Task<StoredFile?> GetFileInfoAsync(Guid fileId, CancellationToken token = default);
+        Task DeleteFileAsync(Guid fileId, CancellationToken token = default);
+        Task<StoredFile> GetFileInfoAsync(Guid fileId, CancellationToken token = default);
     }
 }
