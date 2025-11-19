@@ -14,16 +14,19 @@ namespace Tests.Common
             Containers = [];
         }
 
-        public HttpClient CreateClientWithJwt(string token)
+        public HttpClient CreateClientWithUserId(
+            string? userId = null)
         {
             var client = CreateClient();
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            if (userId != null)
+            {
+                client.DefaultRequestHeaders.Add("userId", userId);
+            }
             return client;
         }
 
         public abstract Task InitializeAsync();
         public abstract new Task DisposeAsync();
-        public abstract Task ResetAsync();
         protected abstract bool CanConnectToExistingContainers();
     }
 }

@@ -161,7 +161,7 @@ namespace Auth.IntegrationTests.Helpers
             }
         }
 
-        public override async Task ResetAsync()
+        public async Task ResetAsync()
         {
             using var scope = Services.CreateScope();
             var services = scope.ServiceProvider;
@@ -189,6 +189,13 @@ namespace Auth.IntegrationTests.Helpers
             {
                 await cache.RemoveByPatternAsync(pattern);
             }
+        }
+
+        public HttpClient CreateClientWithJwt(string token)
+        {
+            var client = CreateClient();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            return client;
         }
 
         protected override bool CanConnectToExistingContainers()
