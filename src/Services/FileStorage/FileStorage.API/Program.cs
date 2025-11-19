@@ -1,4 +1,5 @@
 using FileStorage.API.HealthChecks;
+using FileStorage.API.Middleware;
 using FileStorage.Core.Interfaces.Repositories;
 using FileStorage.Core.Interfaces.Services;
 using FileStorage.Core.Services;
@@ -42,6 +43,8 @@ namespace FileStorage.API
             }
 
             app.UseRouting();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.MapControllers();
             app.MapHealthChecks("/health");

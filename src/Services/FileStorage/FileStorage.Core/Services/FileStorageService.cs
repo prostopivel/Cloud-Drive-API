@@ -65,14 +65,14 @@ namespace FileStorage.Core.Services
             return new FileDownloadResult(fileStream, fileInfo.FileName, fileInfo.ContentType);
         }
 
-        public async Task<bool> DeleteFileAsync(Guid fileId,
+        public async Task DeleteFileAsync(Guid fileId,
             CancellationToken token = default)
         {
             var fileInfo = await _fileStorageRepository.GetFileAsync(fileId, token);
             if (fileInfo == null)
             {
                 _logger.LogWarning("File not found for deletion: {FileId}", fileId);
-                return false;
+                throw new NotFoundException("File not found");
             }
 
             var deleted = await _fileStorageRepository.DeleteFileAsync(fileId, token);
@@ -82,11 +82,9 @@ namespace FileStorage.Core.Services
                 _logger.LogInformation("File deleted successfully: {FileId} ({FileName})",
                     fileId, fileInfo.FileName);
             }
-
-            return deleted;
         }
 
-        public async Task<StoredFile?> GetFileInfoAsync(Guid fileId,
+        public async Task<StoredFile> GetFileInfoAsync(Guid fileId,
             CancellationToken token = default)
         {
             var fileInfo = await _fileStorageRepository.GetFileAsync(fileId, token);
@@ -94,6 +92,7 @@ namespace FileStorage.Core.Services
             if (fileInfo == null)
             {
                 _logger.LogDebug("File info not found: {FileId}", fileId);
+                throw new NotFoundException("File not found");
             }
 
             return fileInfo;
@@ -101,7 +100,7 @@ namespace FileStorage.Core.Services
 
         private void ValidateFile(IFormFile file)
         {
-            if (file.Length == 0)
+            if (file == null || file.Length == 0)
             {
                 throw new InvalidFileException("File is empty");
             }
