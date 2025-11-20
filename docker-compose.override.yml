@@ -53,3 +53,25 @@ services:
       - Redis__CacheTimeoutMinutes=30
     command: ["all"]
     profiles: ["test"]
+
+  filestorage-integration-tests:
+    build:
+      context: .
+      dockerfile: tests/FileStorage.IntegrationTests/Dockerfile
+    depends_on:
+      filestorage-service:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+    profiles: ["test"]
+
+  filestorage-load-tests:
+    build:
+      context: .
+      dockerfile: tests/FileStorage.LoadTests/Dockerfile
+    depends_on:
+      filestorage-service:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+    profiles: ["test"]

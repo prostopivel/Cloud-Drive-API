@@ -12,19 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Services/FileMetadata/FileMetadata.API/FileMetadata.API.csproj", "src/Services/FileMetadata/FileMetadata.API/"]
-RUN dotnet restore "./src/Services/FileMetadata/FileMetadata.API/FileMetadata.API.csproj"
+COPY ["src/Services/FileStorage/FileStorage.API/FileStorage.API.csproj", "src/Services/FileStorage/FileStorage.API/"]
+RUN dotnet restore "./src/Services/FileStorage/FileStorage.API/FileStorage.API.csproj"
 COPY . .
-WORKDIR "/src/src/Services/FileMetadata/FileMetadata.API"
-RUN dotnet build "./FileMetadata.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/Services/FileStorage/FileStorage.API"
+RUN dotnet build "./FileStorage.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Этот этап используется для публикации проекта службы, который будет скопирован на последний этап
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./FileMetadata.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./FileStorage.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "FileMetadata.API.dll"]
+ENTRYPOINT ["dotnet", "FileStorage.API.dll"]

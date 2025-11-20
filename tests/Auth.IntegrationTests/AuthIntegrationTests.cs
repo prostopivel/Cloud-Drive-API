@@ -4,19 +4,23 @@ using Auth.Core.Interfaces.Repositories;
 using Auth.IntegrationTests.DTOs;
 using Auth.IntegrationTests.Helpers;
 using FluentAssertions;
-using Tests.Common;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Tests.Common;
 using Xunit;
 
 namespace Auth.IntegrationTests
 {
     public class AuthIntegrationTests : BaseIntegrationTests<AuthApiFactory, Program>
     {
-        public AuthIntegrationTests(AuthApiFactory factory) : base(factory)
+        protected readonly Func<Task> _resetState;
+
+        public AuthIntegrationTests(AuthApiFactory factory)
+            : base(factory)
         {
+            _resetState = factory.ResetAsync;
         }
 
         public override Task InitializeAsync() => Task.CompletedTask;
