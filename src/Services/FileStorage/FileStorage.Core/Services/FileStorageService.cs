@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shared.Common.Exceptions;
 using Shared.Common.Models;
+using Shared.Messaging;
+using Shared.Messaging.Events;
 
 namespace FileStorage.Core.Services
 {
@@ -14,20 +16,23 @@ namespace FileStorage.Core.Services
     {
         private readonly IFileStorageRepository _fileStorageRepository;
         private readonly FileStorageSettings _settings;
+        private readonly IMessageBus _messageBus;
         private readonly ILogger<FileStorageService> _logger;
 
         public FileStorageService(
             IFileStorageRepository fileStorageRepository,
             IOptions<FileStorageSettings> settings,
+            IMessageBus messageBus,
             ILogger<FileStorageService> logger)
         {
             _fileStorageRepository = fileStorageRepository;
             _settings = settings.Value;
+            _messageBus = messageBus;
             _logger = logger;
         }
 
         public async Task<StoredFile> UploadFileAsync(IFormFile file,
-            Guid? userId = null,
+            Guid userId,
             CancellationToken token = default)
         {
             ValidateFile(file);
@@ -40,6 +45,20 @@ namespace FileStorage.Core.Services
                 file.Length,
                 userId,
                 token);
+
+            var fileEvent = new FileUploadedEvent
+            {
+                FileId = storedFile.Id,
+                UserId = userId,
+                FileName = storedFile.FileName,
+                OriginalName = file.FileName,
+                StoragePath = storedFile.StoragePath,
+                FileSize = storedFile.Size,
+                UploadedAt = storedFile.UploadedAt,
+                ContentType = storedFile.ContentType
+            };
+
+            _messageBus.Publish(fileEvent, "file_events");
 
             _logger.LogInformation("File uploaded successfully: {FileId} ({FileName}, {Size} bytes)",
                 storedFile.Id, storedFile.FileName, storedFile.Size);

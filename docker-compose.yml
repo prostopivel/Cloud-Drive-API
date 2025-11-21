@@ -147,7 +147,11 @@ services:
     environment:
       - FileStorage__StoragePath=/app/storage
       - FileStorage__MaxFileSize=104857600
-      - FileStorage__AllowedExtensions=.pdf,.jpg,.jpeg,.png,.txt,.zip
+      - FileStorage__AllowedExtensions=.pdf,.jpg,.jpeg,.png,.txt,.zip,.doc,.docx
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:5003
     volumes:

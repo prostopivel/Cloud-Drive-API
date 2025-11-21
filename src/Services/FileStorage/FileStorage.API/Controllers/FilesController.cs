@@ -20,7 +20,7 @@ namespace FileStorage.API.Controllers
 
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile(IFormFile file,
-            [FromHeader] Guid? userId = null)
+            [FromHeader] Guid userId)
         {
             var storedFile = await _fileStorageService.UploadFileAsync(file, userId);
 
@@ -30,7 +30,7 @@ namespace FileStorage.API.Controllers
             return Ok(new FileUploadResponse
             {
                 FileId = storedFile.Id,
-                FileName = storedFile.FileName,
+                FileName = storedFile.OriginalName,
                 Size = storedFile.Size,
                 UploadedAt = storedFile.UploadedAt
             });
