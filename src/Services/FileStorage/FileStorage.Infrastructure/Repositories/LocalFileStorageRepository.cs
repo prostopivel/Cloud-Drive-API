@@ -25,7 +25,7 @@ namespace FileStorage.Infrastructure.Repositories
             string fileName,
             string contentType,
             long fileSize,
-            Guid? userId = null,
+            Guid userId,
             CancellationToken token = default)
         {
             var fileId = Guid.NewGuid();
@@ -41,7 +41,8 @@ namespace FileStorage.Infrastructure.Repositories
             var storedFile = new StoredFile
             {
                 Id = fileId,
-                FileName = fileName,
+                FileName = storageFileName,
+                OriginalName = fileName,
                 StoragePath = storageFilePath,
                 ContentType = contentType,
                 Size = fileSize,

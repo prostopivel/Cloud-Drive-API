@@ -20,13 +20,15 @@ namespace FileStorage.API.HealthChecks
             {
                 // Test if storage is writable by creating a test file
                 var testContent = "health_check_test";
+                var testUserId = Guid.NewGuid();
                 using var testStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(testContent));
 
                 var testFile = await _fileStorageRepository.SaveFileAsync(
                     testStream,
                     "health_check.txt",
                     "text/plain",
-                    testContent.Length);
+                    testContent.Length,
+                    testUserId);
 
                 // Test if we can read the file back
                 var fileInfo = await _fileStorageRepository.GetFileAsync(testFile.Id);
