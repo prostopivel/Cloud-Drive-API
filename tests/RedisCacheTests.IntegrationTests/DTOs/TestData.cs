@@ -1,4 +1,4 @@
-﻿namespace Auth.IntegrationTests.DTOs
+﻿namespace RedisCacheTests.IntegrationTests.DTOs
 {
     public record TestData
     {
