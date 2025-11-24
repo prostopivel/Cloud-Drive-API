@@ -4,7 +4,8 @@ namespace Tests.Common.Extensions
 {
     public static class DistributedCacheExtensions
     {
-        public static async Task RemoveByPatternAsync(this IDistributedCache cache, string pattern)
+        public static async Task RemoveByPatternAsync(this IDistributedCache cache,
+            string pattern)
         {
             var keysToRemove = new[]
             {
