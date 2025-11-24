@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Shared.Common.Models;
+using Shared.Messaging.Interfaces;
 using System.Text;
 using System.Text.Json;
 
