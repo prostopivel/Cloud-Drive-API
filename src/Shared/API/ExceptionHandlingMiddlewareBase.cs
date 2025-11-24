@@ -79,14 +79,14 @@ namespace Shared.API
                     Logger.LogWarning(validationEx, "Validation error occurred");
                     break;
 
-                case ConflictException conflictnEx:
+                case ConflictException conflictEx:
                     context.Response.StatusCode = (int)HttpStatusCode.Conflict;
                     response = new ErrorResponse
                     {
-                        Error = conflictnEx.Message,
+                        Error = conflictEx.Message,
                         Code = "CONFLICT_ERROR",
                     };
-                    Logger.LogWarning(conflictnEx, "Conflict error occurred");
+                    Logger.LogWarning(conflictEx, "Conflict error occurred");
                     break;
 
                 case NotFoundException notFoundEx:
@@ -97,6 +97,16 @@ namespace Shared.API
                         Code = "NOT_FOUND_ERROR",
                     };
                     Logger.LogWarning(notFoundEx, "NotFound error occurred");
+                    break;
+
+                case ForbidException forbidEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    response = new ErrorResponse
+                    {
+                        Error = forbidEx.Message,
+                        Code = "FORBID_ERROR",
+                    };
+                    Logger.LogWarning(forbidEx, "Forbid error occurred");
                     break;
 
                 default:
