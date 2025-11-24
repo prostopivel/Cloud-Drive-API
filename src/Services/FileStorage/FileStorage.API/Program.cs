@@ -7,6 +7,7 @@ using FileStorage.Infrastructure.Repositories;
 using Microsoft.Extensions.Options;
 using Shared.Common.Models;
 using Shared.Messaging;
+using Shared.Messaging.Interfaces;
 
 namespace FileStorage.API
 {

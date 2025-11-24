@@ -7,8 +7,11 @@ using FileMetadata.Infrastructure.Data;
 using FileMetadata.Infrastructure.Repositories;
 using FileMetadata.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using Shared.Caching.Interfaces;
+using Shared.Caching.Services;
 using Shared.Common.Models;
 using Shared.Messaging;
+using Shared.Messaging.Interfaces;
 
 namespace FileMetadata.API
 {
@@ -44,11 +47,11 @@ namespace FileMetadata.API
 
             // Services
             builder.Services.AddScoped<IFileMetadataRepository, FileMetadataRepository>();
+            builder.Services.AddScoped<ICacheService, RedisCacheService>();
             builder.Services.AddScoped<IFileMetadataService, FileMetadataService>();
             builder.Services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
             builder.Services.AddSingleton<IMessageConsumer, RabbitMQMessageConsumer>();
-            builder.Services.AddHostedService(provider =>
-                (RabbitMQMessageConsumer)provider.GetRequiredService<IMessageConsumer>());
+            builder.Services.AddHostedService<MessageConsumerHostedService>();
 
             // Health checks
             builder.Services.AddHealthChecks()

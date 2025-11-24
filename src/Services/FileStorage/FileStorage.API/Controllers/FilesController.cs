@@ -20,9 +20,12 @@ namespace FileStorage.API.Controllers
 
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile(IFormFile file,
-            [FromHeader] Guid userId)
+            [FromHeader] Guid userId,
+            CancellationToken token = default)
         {
-            var storedFile = await _fileStorageService.UploadFileAsync(file, userId);
+            var storedFile = await _fileStorageService.UploadFileAsync(file,
+                userId,
+                token: token);
 
             _logger.LogInformation("File uploaded successfully: {FileName} ({Size} bytes)",
                 storedFile.FileName, storedFile.Size);
@@ -37,9 +40,11 @@ namespace FileStorage.API.Controllers
         }
 
         [HttpGet("download/{fileId:guid}")]
-        public async Task<IActionResult> DownloadFile(Guid fileId)
+        public async Task<IActionResult> DownloadFile(Guid fileId,
+            CancellationToken token = default)
         {
-            var result = await _fileStorageService.DownloadFileAsync(fileId);
+            var result = await _fileStorageService.DownloadFileAsync(fileId,
+                token: token);
 
             _logger.LogInformation("File downloaded: {FileId}", fileId);
 
@@ -47,18 +52,22 @@ namespace FileStorage.API.Controllers
         }
 
         [HttpDelete("{fileId:guid}")]
-        public async Task<IActionResult> DeleteFile(Guid fileId)
+        public async Task<IActionResult> DeleteFile(Guid fileId,
+            CancellationToken token = default)
         {
-            await _fileStorageService.DeleteFileAsync(fileId);
+            await _fileStorageService.DeleteFileAsync(fileId,
+                token: token);
 
             _logger.LogInformation("File deleted: {FileId}", fileId);
             return Ok(new { message = "File deleted successfully" });
         }
 
         [HttpGet("{fileId:guid}/info")]
-        public async Task<IActionResult> GetFileInfo(Guid fileId)
+        public async Task<IActionResult> GetFileInfo(Guid fileId,
+            CancellationToken token = default)
         {
-            var fileInfo = await _fileStorageService.GetFileInfoAsync(fileId);
+            var fileInfo = await _fileStorageService.GetFileInfoAsync(fileId,
+                token: token);
 
             return Ok(new FileInfoResponse
             {

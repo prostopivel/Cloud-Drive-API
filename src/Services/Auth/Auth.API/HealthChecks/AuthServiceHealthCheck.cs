@@ -1,5 +1,6 @@
 ﻿using Auth.Core.Interfaces.Services;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Shared.Caching.Interfaces;
 
 namespace Auth.API.HealthChecks
 {

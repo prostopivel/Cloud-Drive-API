@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shared.Common.Exceptions;
 using Shared.Common.Models;
-using Shared.Messaging;
 using Shared.Messaging.Events;
+using Shared.Messaging.Interfaces;
 
 namespace FileStorage.Core.Services
 {
