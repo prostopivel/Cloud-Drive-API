@@ -3,11 +3,11 @@
     public interface IFileMetadataService
     {
         Task<Entities.FileMetadata> CreateFileMetadataAsync(Guid fileId, string fileName,
-            string originalName, long size, string contentType, Guid userId, string storagePath);
-        Task<Entities.FileMetadata?> GetFileMetadataAsync(Guid fileId);
-        Task<IEnumerable<Entities.FileMetadata>> GetUserFilesAsync(Guid userId);
-        Task<bool> DeleteFileMetadataAsync(Guid fileId);
-        Task<bool> BelongsToUserAsync(Guid fileId, Guid userId);
-        Task UpdateLastAccessedAsync(Guid fileId);
+            string originalName, long size, string contentType, Guid userId,
+            string storagePath, CancellationToken token = default);
+        Task<Entities.FileMetadata> GetFileMetadataAsync(Guid fileId, Guid userId, CancellationToken token = default);
+        Task<IEnumerable<Entities.FileMetadata>> GetUserFilesAsync(Guid userId, CancellationToken token = default);
+        Task DeleteFileMetadataAsync(Guid fileId, Guid userId, CancellationToken token = default);
+        Task BelongsToUserAsync(Guid fileId, Guid userId, CancellationToken token = default);
     }
 }

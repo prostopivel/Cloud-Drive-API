@@ -1,6 +1,7 @@
 ﻿using FileMetadata.API.DTOs;
 using FileMetadata.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Common.Exceptions;
 
 namespace FileMetadata.API.Controllers
 {
@@ -9,111 +10,82 @@ namespace FileMetadata.API.Controllers
     public class FilesController : ControllerBase
     {
         private readonly IFileMetadataService _fileMetadataService;
-        private readonly ILogger<FilesController> _logger;
 
-        public FilesController(IFileMetadataService fileMetadataService, ILogger<FilesController> logger)
+        public FilesController(IFileMetadataService fileMetadataService)
         {
             _fileMetadataService = fileMetadataService;
-            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUserFiles([FromHeader] Guid userId)
+        public async Task<IActionResult> GetUserFiles([FromHeader] Guid userId,
+            CancellationToken token = default)
         {
-            try
+            var files = await _fileMetadataService.GetUserFilesAsync(userId,
+                token: token);
+            var response = files.Select(f => new FileMetadataResponse
             {
-                var files = await _fileMetadataService.GetUserFilesAsync(userId);
-                var response = files.Select(f => new FileMetadataResponse
-                {
-                    FileId = f.Id,
-                    FileName = f.OriginalName,
-                    Size = f.Size,
-                    ContentType = f.ContentType,
-                    UploadedAt = f.UploadedAt,
-                    LastAccessedAt = f.LastAccessedAt
-                });
+                FileId = f.Id,
+                FileName = f.OriginalName,
+                Size = f.Size,
+                ContentType = f.ContentType,
+                UploadedAt = f.UploadedAt,
+                LastAccessedAt = f.LastAccessedAt
+            });
 
-                _logger.LogInformation("Retrieved {Count} files for user {UserId}", files.Count(), userId);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting files for user {UserId}", userId);
-                return StatusCode(500, "Error retrieving files");
-            }
+            return Ok(response);
         }
 
         [HttpGet("{fileId:guid}")]
-        public async Task<IActionResult> GetFileMetadata(Guid fileId, [FromHeader] Guid userId)
+        public async Task<IActionResult> GetFileMetadata(Guid fileId,
+            [FromHeader] Guid userId,
+            CancellationToken token = default)
         {
-            try
+            var fileMetadata = await _fileMetadataService.GetFileMetadataAsync(fileId,
+                userId,
+                token: token);
+
+            var response = new FileMetadataResponse
             {
-                var fileMetadata = await _fileMetadataService.GetFileMetadataAsync(fileId);
-                if (fileMetadata == null)
-                    return NotFound($"File with id {fileId} not found");
+                FileId = fileMetadata.Id,
+                FileName = fileMetadata.OriginalName,
+                Size = fileMetadata.Size,
+                ContentType = fileMetadata.ContentType,
+                UploadedAt = fileMetadata.UploadedAt,
+                LastAccessedAt = fileMetadata.LastAccessedAt
+            };
 
-                if (fileMetadata.UserId != userId)
-                    return Forbid("File does not belong to user");
-
-                var response = new FileMetadataResponse
-                {
-                    FileId = fileMetadata.Id,
-                    FileName = fileMetadata.OriginalName,
-                    Size = fileMetadata.Size,
-                    ContentType = fileMetadata.ContentType,
-                    UploadedAt = fileMetadata.UploadedAt,
-                    LastAccessedAt = fileMetadata.LastAccessedAt
-                };
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting file metadata {FileId}", fileId);
-                return StatusCode(500, "Error retrieving file metadata");
-            }
+            return Ok(response);
         }
 
         [HttpDelete("{fileId:guid}")]
-        public async Task<IActionResult> DeleteFileMetadata(Guid fileId, [FromHeader] Guid userId)
+        public async Task<IActionResult> DeleteFileMetadata(Guid fileId,
+            [FromHeader] Guid userId,
+            CancellationToken token = default)
         {
-            try
-            {
-                var belongsToUser = await _fileMetadataService.BelongsToUserAsync(fileId, userId);
-                if (!belongsToUser)
-                    return Forbid("File does not belong to user");
+            await _fileMetadataService.DeleteFileMetadataAsync(fileId,
+                userId,
+                token: token);
 
-                var deleted = await _fileMetadataService.DeleteFileMetadataAsync(fileId);
-                if (!deleted)
-                    return NotFound($"File with id {fileId} not found");
-
-                _logger.LogInformation("File metadata deleted: {FileId} by user {UserId}", fileId, userId);
-                return Ok(new { message = "File metadata deleted successfully" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting file metadata {FileId}", fileId);
-                return StatusCode(500, "Error deleting file metadata");
-            }
+            return Ok(new { message = "File metadata deleted successfully" });
         }
 
         [HttpPost("{fileId:guid}/validate-ownership")]
-        public async Task<IActionResult> ValidateOwnership(Guid fileId, [FromHeader] Guid userId)
+        public async Task<IActionResult> ValidateOwnership(Guid fileId,
+            [FromHeader] Guid userId,
+            CancellationToken token = default)
         {
             try
             {
-                var belongsToUser = await _fileMetadataService.BelongsToUserAsync(fileId, userId);
-
-                _logger.LogDebug("Ownership validation: File {FileId}, User {UserId}, Result: {Result}",
-                    fileId, userId, belongsToUser);
-
-                return Ok(new { belongsToUser });
+                await _fileMetadataService.BelongsToUserAsync(fileId,
+                    userId,
+                token: token);
             }
-            catch (Exception ex)
+            catch (ForbidException)
             {
-                _logger.LogError(ex, "Error validating ownership for file {FileId}", fileId);
-                return StatusCode(500, "Error validating ownership");
+                return Ok(new { belongsToUser = false });
             }
+
+            return Ok(new { belongsToUser = true });
         }
     }
 }

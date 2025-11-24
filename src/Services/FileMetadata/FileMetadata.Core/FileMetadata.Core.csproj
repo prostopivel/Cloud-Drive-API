@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Caching\Shared.Caching.csproj" />
     <ProjectReference Include="..\..\..\Shared\Common\Shared.Common.csproj" />
   </ItemGroup>
 

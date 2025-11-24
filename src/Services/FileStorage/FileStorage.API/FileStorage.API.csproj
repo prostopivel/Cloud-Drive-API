@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Shared.API\Shared.API.csproj" />
+    <ProjectReference Include="..\..\..\Shared\API\Shared.API.csproj" />
     <ProjectReference Include="..\FileStorage.Core\FileStorage.Core.csproj" />
     <ProjectReference Include="..\FileStorage.Infrastructure\FileStorage.Infrastructure.csproj" />
   </ItemGroup>

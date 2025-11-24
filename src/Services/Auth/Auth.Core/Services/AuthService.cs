@@ -4,12 +4,15 @@ using Auth.Core.Exceptions;
 using Auth.Core.Interfaces.Repositories;
 using Auth.Core.Interfaces.Services;
 using Microsoft.Extensions.Logging;
+using Shared.Caching.Interfaces;
 using Shared.Common.Exceptions;
 
 namespace Auth.Core.Services
 {
     public class AuthService : IAuthService
     {
+        private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(30);
+
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
         private readonly IPasswordHasher _passwordHasher;
@@ -54,6 +57,7 @@ namespace Auth.Core.Services
 
             await InvalidateUserCache(createdUser.Id, createdUser.Email, token: token);
 
+            _logger.LogInformation("User with email {Email} created: {UserId}", email, user.Id);
             return createdUser;
         }
 
@@ -84,7 +88,7 @@ namespace Auth.Core.Services
             }
 
             await _cacheService.SetAsync(cacheKey, user,
-                TimeSpan.FromMinutes(30), token: token);
+                CacheExpiration, token: token);
             _logger.LogInformation("User {Email} cached", email);
 
             return user;

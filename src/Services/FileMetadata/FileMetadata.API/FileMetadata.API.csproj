@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Shared.API\Shared.API.csproj" />
+    <ProjectReference Include="..\..\..\Shared\API\Shared.API.csproj" />
     <ProjectReference Include="..\FileMetadata.Core\FileMetadata.Core.csproj" />
     <ProjectReference Include="..\FileMetadata.Infrastructure\FileMetadata.Infrastructure.csproj" />
   </ItemGroup>

@@ -1,24 +1,24 @@
 ﻿using FileMetadata.Core.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Shared.Common.Models;
 using Shared.Messaging.Events;
+using Shared.Messaging.Interfaces;
 using System.Text;
 using System.Text.Json;
 
 namespace FileMetadata.Infrastructure.Services
 {
-    public class RabbitMQMessageConsumer : IMessageConsumer, IHostedService
+    public class RabbitMQMessageConsumer : IMessageConsumer
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly RabbitMQSettings _rabbitMqSettings;
         private readonly ILogger<RabbitMQMessageConsumer> _logger;
         private IConnection? _connection;
-        private RabbitMQ.Client.IModel? _channel;
+        private IModel? _channel;
         private const string ExchangeName = "file_events";
         private const string QueueName = "file_metadata_queue";
 
@@ -86,8 +86,14 @@ namespace FileMetadata.Infrastructure.Services
 
         public void StopConsuming()
         {
-            _channel?.Close();
-            _connection?.Close();
+            if (_channel?.IsOpen == true)
+            {
+                _channel.Close();
+            }
+            if (_connection?.IsOpen == true)
+            {
+                _connection.Close();
+            }
             _logger.LogInformation("RabbitMQ consumer stopped");
         }
 
@@ -127,18 +133,6 @@ namespace FileMetadata.Infrastructure.Services
                 _logger.LogError(ex, "Error processing file upload event: {Message}", message);
                 throw;
             }
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            StartConsuming();
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            StopConsuming();
-            return Task.CompletedTask;
         }
     }
 }

@@ -18,43 +18,49 @@ namespace Auth.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request,
+            CancellationToken token = default)
         {
             var user = await _authService.RegisterAsync(
                 request.Username,
                 request.Email,
-                request.Password);
-            var token = _tokenService.GenerateToken(user);
+                request.Password,
+                token: token);
+            var jwtToken = _tokenService.GenerateToken(user);
 
             return Ok(new AuthResponse
             {
                 UserId = user.Id,
                 Username = user.Username,
-                Token = token
+                Token = jwtToken
             });
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request,
+            CancellationToken token = default)
         {
             var user = await _authService.LoginAsync(
                 request.Email,
-                request.Password);
+                request.Password,
+                token: token);
 
-            var token = _tokenService.GenerateToken(user);
+            var jwtToken = _tokenService.GenerateToken(user);
 
             return Ok(new AuthResponse
             {
                 UserId = user.Id,
                 Username = user.Username,
-                Token = token
+                Token = jwtToken
             });
         }
 
         [HttpPost("validate")]
-        public async Task<IActionResult> Validate([FromBody] ValidateTokenRequest request)
+        public async Task<IActionResult> Validate([FromBody] ValidateTokenRequest request,
+            CancellationToken token = default)
         {
-            var isValid = await _authService.ValidateTokenAsync(request.Token);
+            var isValid = await _authService.ValidateTokenAsync(request.Token,
+                token: token);
             return Ok(new { isValid });
         }
     }
