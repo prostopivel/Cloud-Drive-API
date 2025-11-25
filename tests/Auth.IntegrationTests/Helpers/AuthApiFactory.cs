@@ -110,8 +110,10 @@ namespace Auth.IntegrationTests.Helpers
             }
             else
             {
-                builder.ConfigureDb<AuthDbContext>((PostgreSqlContainer)Containers[POSTGRE_CONTAINER_NAME]);
-                builder.ConfigureCache((RedisContainer)Containers[REDIS_CONTAINER_NAME], _redisInstanceName);
+                builder.ConfigureDb<AuthDbContext>(
+                    (PostgreSqlContainer)Containers[POSTGRE_CONTAINER_NAME]);
+                builder.ConfigureCache(
+                    (RedisContainer)Containers[REDIS_CONTAINER_NAME], _redisInstanceName);
             }
 
             builder.UseEnvironment("Testing");

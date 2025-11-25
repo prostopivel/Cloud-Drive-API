@@ -1,4 +1,4 @@
-﻿namespace Auth.Core.Interfaces.Services
+﻿namespace Shared.Caching.Interfaces
 {
     public interface ICacheService
     {

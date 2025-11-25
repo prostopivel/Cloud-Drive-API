@@ -5,7 +5,7 @@ namespace FileStorage.Core.Interfaces.Services
 {
     public interface IFileStorageService
     {
-        Task<StoredFile> UploadFileAsync(IFormFile file, Guid? userId = null,
+        Task<StoredFile> UploadFileAsync(IFormFile file, Guid userId,
             CancellationToken token = default);
         Task<FileDownloadResult> DownloadFileAsync(Guid fileId, CancellationToken token = default);
         Task DeleteFileAsync(Guid fileId, CancellationToken token = default);

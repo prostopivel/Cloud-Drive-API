@@ -1,10 +1,11 @@
 version: '3.8'
 
 services:
+  # Auth Service Tests
   auth-integration-tests:
     build:
       context: .
-      dockerfile: tests/Dockerfile
+      dockerfile: tests/Auth.IntegrationTests/Dockerfile
     depends_on:
       auth-db:
         condition: service_healthy
@@ -16,44 +17,27 @@ services:
       - Redis__ConnectionString=redis:6379
       - Redis__InstanceName=AuthIntegrationTests
       - Redis__CacheTimeoutMinutes=30
-    command: ["integration"]
+      - Jwt__Secret=test-super-secret-key-for-testing-environment-only-32-chars
+      - Jwt__Issuer=SimpleCloudDrive-Test
+      - Jwt__Audience=SimpleCloudDrive-Test
+      - Jwt__ExpiryMinutes=60
+    command: ["dotnet", "test", "--verbosity", "normal"]
     profiles: ["test"]
 
   auth-load-tests:
     build:
       context: .
-      dockerfile: tests/Dockerfile
+      dockerfile: tests/Auth.LoadTests/Dockerfile
     depends_on:
       auth-service:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Testing
-      - Redis__ConnectionString=redis:6379
-      - Redis__InstanceName=AuthLoadTests
-      - Redis__CacheTimeoutMinutes=30
-    command: ["load"]
+      - Services__Auth=http://auth-service:5001
+    command: ["dotnet", "test", "--verbosity", "normal"]
     profiles: ["test"]
 
-  auth-all-tests:
-    build:
-      context: .
-      dockerfile: tests/Dockerfile
-    depends_on:
-      auth-db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-      auth-service:
-        condition: service_healthy
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Testing
-      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=auth_db;Username=auth_user;Password=auth_password
-      - Redis__ConnectionString=redis:6379
-      - Redis__InstanceName=AuthAllTests
-      - Redis__CacheTimeoutMinutes=30
-    command: ["all"]
-    profiles: ["test"]
-
+  # File Storage Service Tests
   filestorage-integration-tests:
     build:
       context: .
@@ -61,8 +45,20 @@ services:
     depends_on:
       filestorage-service:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Testing
+      - FileStorage__StoragePath=/app/storage
+      - FileStorage__MaxFileSize=104857600
+      - FileStorage__AllowedExtensions=.pdf,.jpg,.jpeg,.png,.txt,.zip,.doc,.docx
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    volumes:
+      - filestorage_test_data:/app/storage
+    command: ["dotnet", "test", "--verbosity", "normal"]
     profiles: ["test"]
 
   filestorage-load-tests:
@@ -74,4 +70,73 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Testing
+      - Services__FileStorage=http://filestorage-service:5003
+    command: ["dotnet", "test", "--verbosity", "normal"]
     profiles: ["test"]
+
+  # File Metadata Service Tests
+  filemetadata-integration-tests:
+    build:
+      context: .
+      dockerfile: tests/FileMetadata.IntegrationTests/Dockerfile
+    depends_on:
+      metadata-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      filestorage-service:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+      - ConnectionStrings__DefaultConnection=Host=metadata-db;Database=metadata_db;Username=metadata_user;Password=metadata_password
+      - Redis__ConnectionString=redis:6379
+      - Redis__InstanceName=FileMetadataIntegrationTests
+      - Redis__CacheTimeoutMinutes=30
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - Services__FileStorage=http://filestorage-service:5003
+    command: ["dotnet", "test", "--verbosity", "normal"]
+    profiles: ["test"]
+
+  filemetadata-load-tests:
+    build:
+      context: .
+      dockerfile: tests/FileMetadata.LoadTests/Dockerfile
+    depends_on:
+      filemetadata-service:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+      - Services__FileMetadata=http://filemetadata-service:5002
+    command: ["dotnet", "test", "--verbosity", "normal"]
+    profiles: ["test"]
+
+  # API Gateway Integration Tests
+  apigateway-integration-tests:
+    build:
+      context: .
+      dockerfile: tests/ApiGateway.IntegrationTests/Dockerfile
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      filemetadata-service:
+        condition: service_healthy
+      filestorage-service:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+      - Services__Auth=http://auth-service:5001
+      - Services__FileMetadata=http://filemetadata-service:5002
+      - Services__FileStorage=http://filestorage-service:5003
+      - ApiGateway__Url=http://api-gateway:5000
+    command: ["dotnet", "test", "--verbosity", "normal"]
+    profiles: ["test"]
+
+volumes:
+  filestorage_test_data:

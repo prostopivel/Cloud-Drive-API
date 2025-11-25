@@ -7,15 +7,14 @@ namespace Tests.Common
     public abstract class BaseApiFactory<T> : WebApplicationFactory<T>, IAsyncLifetime
         where T : class
     {
-        protected Dictionary<string, DockerContainer> Containers { get; init; }
+        protected Dictionary<string, IContainer> Containers { get; init; }
 
         protected BaseApiFactory()
         {
             Containers = [];
         }
 
-        public HttpClient CreateClientWithUserId(
-            string? userId = null)
+        public HttpClient CreateClientWithUserId(string? userId = null)
         {
             var client = CreateClient();
             if (userId != null)

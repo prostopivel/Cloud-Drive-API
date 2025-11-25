@@ -18,11 +18,14 @@
     <PackageReference Include="Respawn" Version="6.1.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="3.6.0" />
     <PackageReference Include="Testcontainers.Redis" Version="3.6.0" />
+    <PackageReference Include="Testcontainers.RabbitMq" Version="3.6.0" />
     <PackageReference Include="Bogus" Version="34.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Services\FileMetadata\FileMetadata.Core\FileMetadata.Core.csproj" />
     <ProjectReference Include="..\..\src\Shared\Common\Shared.Common.csproj" />
+    <ProjectReference Include="..\..\src\Shared\Messaging\Shared.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

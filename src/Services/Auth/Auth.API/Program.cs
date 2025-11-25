@@ -6,8 +6,9 @@ using Auth.Core.Services;
 using Auth.Grpc.Services;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Repositories;
-using Auth.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using Shared.Caching.Interfaces;
+using Shared.Caching.Services;
 using Shared.Common.Models;
 
 namespace Auth.API

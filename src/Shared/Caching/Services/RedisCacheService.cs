@@ -1,9 +1,9 @@
-﻿using Auth.Core.Interfaces.Services;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Shared.Caching.Interfaces;
 using System.Text.Json;
 
-namespace Auth.Infrastructure.Services
+namespace Shared.Caching.Services
 {
     public class RedisCacheService : ICacheService
     {

@@ -6,6 +6,8 @@ using FileStorage.Core.Services;
 using FileStorage.Infrastructure.Repositories;
 using Microsoft.Extensions.Options;
 using Shared.Common.Models;
+using Shared.Messaging;
+using Shared.Messaging.Interfaces;
 
 namespace FileStorage.API
 {
@@ -26,6 +28,7 @@ namespace FileStorage.API
 
             // Register services
             builder.Services.AddScoped<IFileStorageRepository, LocalFileStorageRepository>();
+            builder.Services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
             builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
             // Health checks
