@@ -22,8 +22,7 @@ namespace ApiGateway.Middleware
         public async Task InvokeAsync(HttpContext context)
         {
             // Skip token validation for auth routes and storage routes
-            if (context.Request.Path.StartsWithSegments("/api/auth") ||
-                context.Request.Path.StartsWithSegments("/storage"))
+            if (context.Request.Path.StartsWithSegments("/api/auth"))
             {
                 await _next(context);
                 return;
