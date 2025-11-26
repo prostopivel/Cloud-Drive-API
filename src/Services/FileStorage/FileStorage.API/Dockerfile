@@ -8,6 +8,7 @@ COPY ["src/Services/FileStorage/FileStorage.API/FileStorage.API.csproj", "src/Se
 COPY ["src/Services/FileStorage/FileStorage.Core/FileStorage.Core.csproj", "src/Services/FileStorage/FileStorage.Core/"]
 COPY ["src/Services/FileStorage/FileStorage.Infrastructure/FileStorage.Infrastructure.csproj", "src/Services/FileStorage/FileStorage.Infrastructure/"]
 COPY ["src/Shared/Common/Shared.Common.csproj", "src/Shared/Common/"]
+COPY ["src/Shared/API/Shared.API.csproj", "src/Shared/API/"]
 RUN dotnet restore "src/Services/FileStorage/FileStorage.API/FileStorage.API.csproj"
 
 COPY . .

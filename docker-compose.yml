@@ -72,10 +72,16 @@ services:
         condition: service_healthy
     environment:
       - Services__Auth=http://auth-service:5001
+      - Services__AuthGrpc=http://auth-service:5002
       - Services__FileMetadata=http://filemetadata-service:5002
       - Services__FileStorage=http://filestorage-service:5003
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:5000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
 
   auth-service:

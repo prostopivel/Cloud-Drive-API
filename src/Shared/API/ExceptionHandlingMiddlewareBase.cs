@@ -109,6 +109,16 @@ namespace Shared.API
                     Logger.LogWarning(forbidEx, "Forbid error occurred");
                     break;
 
+                case AppException appEx:
+                    context.Response.StatusCode = (int)appEx.StatusCode;
+                    response = new ErrorResponse
+                    {
+                        Error = appEx.Message,
+                        Code = "APP_ERROR",
+                    };
+                    Logger.LogWarning(appEx, "App error occurred");
+                    break;
+
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     response = new ErrorResponse
