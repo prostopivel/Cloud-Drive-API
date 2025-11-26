@@ -2,9 +2,11 @@ using ApiGateway.Extensions;
 using ApiGateway.Interfaces;
 using ApiGateway.Middleware;
 using ApiGateway.Services;
+using ApiGateway.Transforms;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Shared.Common.Models;
 
 namespace ApiGateway
@@ -20,7 +22,8 @@ namespace ApiGateway
 
             // Add YARP
             builder.Services.AddReverseProxy()
-                .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+                .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+                .AddTransforms<CustomTransform>();
 
             // Add services
             builder.Services.AddControllers();
@@ -29,6 +32,12 @@ namespace ApiGateway
 
             builder.Services.AddScoped<IUserIdValidator, UserIdValidator>();
             builder.Services.AddScoped<IFilesService, FilesService>();
+
+            // Add Swagger Aggregator Service
+            builder.Services.AddHttpClient<ISwaggerAggregatorService, SwaggerAggregatorService>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
 
             // Add HTTP client for service communication
             builder.Services.AddHttpClient("AuthService",
@@ -80,14 +89,35 @@ namespace ApiGateway
             var app = builder.Build();
 
             // Configure pipeline
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = "swagger/{documentName}/swagger.json";
+                c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+                {
+                    swaggerDoc.Servers =
+                    [
+                        new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" }
+                    ];
+                });
+            });
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cloud Drive API Gateway v1");
+                // Main API Gateway documentation
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Gateway v1");
+
+                // Aggregated documentation from all services
+                c.SwaggerEndpoint("/swagger-aggregate/all.json", "All Services (Aggregated)");
+
+                // Individual service documentation
+                c.SwaggerEndpoint("/auth-service/swagger/v1/swagger.json", "Auth Service");
+                c.SwaggerEndpoint("/filemetadata-service/swagger/v1/swagger.json", "File Metadata Service");
+                c.SwaggerEndpoint("/filestorage-service/swagger/v1/swagger.json", "File Storage Service");
+
                 c.RoutePrefix = "swagger";
                 c.DisplayRequestDuration();
                 c.EnableDeepLinking();
                 c.EnableFilter();
+                c.ShowExtensions();
             });
 
             app.UseRouting();
